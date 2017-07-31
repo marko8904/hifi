@@ -25,9 +25,6 @@ macro(GENERATE_INSTALLERS)
   set(CPACK_PACKAGE_INSTALL_DIRECTORY ${_DISPLAY_NAME})
 
   if (WIN32)
-    # include CMake module that will install compiler system libraries
-    # so that we have msvcr120 and msvcp120 installed with targets
-    set(CMAKE_INSTALL_SYSTEM_RUNTIME_DESTINATION ${INTERFACE_INSTALL_DIR})
 
     # as long as we're including sixense plugin with installer
     # we need re-distributables for VS 2011 as well
