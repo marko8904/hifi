@@ -6,7 +6,7 @@ endif()
 
 # add a target that will package the console
 add_custom_target(${TARGET_NAME}-npm-install
-  COMMAND npm install
+  COMMAND npm install --no-optional
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 add_custom_target(${TARGET_NAME}
