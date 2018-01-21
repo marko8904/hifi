@@ -1,4 +1,4 @@
-﻿//
+//
 //  Created by Bradley Austin Davis 2015/10/09
 //  Copyright 2015 High Fidelity, Inc.
 //
@@ -145,9 +145,9 @@ namespace controller {
     QVector<QString> ScriptingInterface::getActionNames() const {
         return DependencyManager::get<UserInputMapper>()->getActionNames();
     }
-
-    bool ScriptingInterface::triggerHapticPulse(float strength, float duration, controller::Hand hand) const {
-        return DependencyManager::get<UserInputMapper>()->triggerHapticPulse(strength, duration, hand);
+    
+    bool ScriptingInterface::triggerHapticPulse(float strength, float duration, controller::Hand location) const {
+        return DependencyManager::get<UserInputMapper>()->triggerHapticPulse(strength, duration, location);
     }
 
     bool ScriptingInterface::triggerShortHapticPulse(float strength, controller::Hand hand) const {

@@ -72,7 +72,7 @@ void Joystick::handleButtonEvent(const SDL_ControllerButtonEvent& event) {
     }
 }
 
-bool Joystick::triggerHapticPulse(float strength, float duration, controller::Hand hand) {
+bool Joystick::triggerHapticPulse(float strength, float duration, controller::Hand location) {
     if (SDL_HapticRumblePlay(_sdlHaptic, strength, duration) != 0) {
         return false;
     }

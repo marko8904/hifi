@@ -354,11 +354,11 @@ Pose UserInputMapper::getPoseState(Action action) const {
 }
 
 
-bool UserInputMapper::triggerHapticPulse(float strength, float duration, controller::Hand hand) {
+bool UserInputMapper::triggerHapticPulse(float strength, float duration, controller::Hand location) {
     Locker locker(_lock);
     bool toReturn = false;
     for (auto device : _registeredDevices) {
-        toReturn = toReturn || device.second->triggerHapticPulse(strength, duration, hand);
+        toReturn = toReturn || device.second->triggerHapticPulse(strength, duration, location);
     }
     return toReturn;
 }

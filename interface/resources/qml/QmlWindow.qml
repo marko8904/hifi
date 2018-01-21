@@ -4,6 +4,7 @@ import QtQuick.Controls 1.4
 import QtWebChannel 1.0
 import QtWebEngine 1.2
 import QtWebSockets 1.0
+import QtBluetooth 5.2
 
 import "windows" as Windows
 import "controls"
