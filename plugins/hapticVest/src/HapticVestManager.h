@@ -18,7 +18,8 @@
 #include <controllers/InputDevice.h>
 #include <plugins/InputPlugin.h>
 
-#include <QtBluetooth/QLowEnergyController>
+#include <QSerialPort>
+#include <QSerialPortInfo>
 
 class HapticVestManager : public InputPlugin {
     Q_OBJECT
@@ -35,10 +36,7 @@ public:
     void pluginFocusOutEvent() override;
     void pluginUpdate(float deltaTime, const controller::InputCalibrationData& inputCalibrationData) override;
 
-private slots:
-    void connected();
-    void discoveryFinished();
-    void stateChanged(QLowEnergyService::ServiceState newState);
+
     
 private:
     class HapticVestInputDevice : public controller::InputDevice {
@@ -86,14 +84,12 @@ private:
     
     
     
-    void CreateBleController();
-    void ConnectToHapticVest();
-    QLowEnergyController* controller;
-    void DiscoverServices();
-    QLowEnergyService* service;
-    QLowEnergyCharacteristic writeCharacteristic;
     void TurnOffAllMotors();
     void SendByteArray(QByteArray byteArray);
+
+    QList<QSerialPortInfo> ListOfPorts;
+    void ConnectToHapticVest();
+    QSerialPort* serialPort;
     
     void checkForConnectedDevices();
     TouchDevice::Pointer _touch;

@@ -7,5 +7,5 @@
   )
   include_hifi_library_headers(octree)
   
-find_package(Qt5Bluetooth)
-target_link_libraries(${TARGET_NAME} Qt5::Bluetooth)
+find_package(Qt5SerialPort)
+target_link_libraries(${TARGET_NAME} Qt5::SerialPort)

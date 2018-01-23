@@ -22,8 +22,6 @@
 #include <NumericalConstants.h>
 #include <StreamUtils.h>
 
-#include <QtBluetooth/QLowEnergyController>
-#include <QtBluetooth/QBluetoothDeviceInfo>
 
 // #include "HapticVestHelpers.h"
 
@@ -44,65 +42,22 @@ bool HapticVestManager::isSupported() const {
 
 bool HapticVestManager::activate() {
     InputPlugin::activate();
-//    checkForConnectedDevices();
-    CreateBleController();
+    //checkForConnectedDevices();
     ConnectToHapticVest();
+    //CreateBleController();
+    //ConnectToHapticVest();
     return true;
 }
 
-void HapticVestManager::CreateBleController(){
-    //iOS and OSx use UUID instead of address; all others use address
-//    QString address = "DA:D2:1B:34:32:0C";
-//    QString UUID = "16019906-FB92-400E-8982-3D4FC6FAC492";
-    QString UUID = "1555B349-D16E-45A0-BF33-BD4D8F434FC2";
-    QString name = "CLEAR";
-    qDebug() << "Haptic Vest connecting to: " << name << UUID;
-    QBluetoothDeviceInfo* deviceInfo = new QBluetoothDeviceInfo(QBluetoothUuid(UUID),name,0);
-    controller = QLowEnergyController::createCentral(*deviceInfo, this);
-    
-    // Setup slot for connected signal
-    connect(controller, SIGNAL(connected()), this, SLOT(connected()));
-}
-
 void HapticVestManager::ConnectToHapticVest(){
-    if(controller->state()==QLowEnergyController::ControllerState::UnconnectedState){
-        controller->connectToDevice();
+    ListOfPorts = QSerialPortInfo::availablePorts();
+    for (int i = 0; i < ListOfPorts.size(); i++) {
+        qDebug() << "Haptic; port:" << ListOfPorts[i].portName();
     }
+    serialPort = new QSerialPort(ListOfPorts[0]);
+    serialPort->open(QIODevice::WriteOnly);
 }
 
-void HapticVestManager::connected(){
-    qDebug() << "Haptic Vest connected!";
-    DiscoverServices();
-}
-
-void HapticVestManager::DiscoverServices(){
-    // Setup slot for discoveryFinished signal
-    connect(controller, SIGNAL(discoveryFinished()), this, SLOT(discoveryFinished()));
-
-    controller->discoverServices();
-}
-
-void HapticVestManager::discoveryFinished(){
-    QList<QBluetoothUuid> services = controller->services();
-
-    for(QBluetoothUuid& service : services){
-        qDebug() << "Haptic vest service: " << service;
-    }
-    QString serviceUUID = "713d0000-503e-4c75-ba94-3148f18d941e";
-    service = controller->createServiceObject(QBluetoothUuid(serviceUUID));
-    qDebug() << "Haptic vest service created: " << service->serviceUuid();
-    
-    connect(service, SIGNAL(stateChanged(QLowEnergyService::ServiceState)), this, SLOT(stateChanged(QLowEnergyService::ServiceState)));
-    
-    service->discoverDetails();
-}
-
-void HapticVestManager::stateChanged(QLowEnergyService::ServiceState newState){
-    if(newState!=QLowEnergyService::ServiceDiscovered){
-        return;
-    }
-    writeCharacteristic = (service->characteristics())[0];
-}
 
 QByteArray HapticVestManager::TouchDevice::EncodeVibrationArray(int inputArray[]){
     //TODO: ensure that inputArray is of length numberOfMotors
@@ -120,7 +75,7 @@ QByteArray HapticVestManager::TouchDevice::EncodeVibrationArray(int inputArray[]
 }
 
 void HapticVestManager::TurnOffAllMotors(){
-    int numberOfMotors = 32;
+    const int numberOfMotors = 32;
     int offArray[numberOfMotors];
     for (int i = 0; i < numberOfMotors; i++) {
         offArray[i] = 0;
@@ -129,11 +84,7 @@ void HapticVestManager::TurnOffAllMotors(){
 }
 
 void HapticVestManager::SendByteArray(QByteArray byteArray){
-    if(service){
-        service->writeCharacteristic(writeCharacteristic, byteArray, QLowEnergyService::WriteWithoutResponse);
-    } else {
-        qDebug() << "Haptic: trying to send but no service yet";
-    }
+    serialPort->write(byteArray);
 }
 
 void HapticVestManager::checkForConnectedDevices() {
@@ -144,9 +95,6 @@ void HapticVestManager::checkForConnectedDevices() {
     auto userInputMapper = DependencyManager::get<controller::UserInputMapper>();
     _touch = std::make_shared<TouchDevice>(*this);
     if(_touch) {
-        qDebug() << "Haptic " << _touch->hapticLocations[0].duration;
-        _touch->hapticLocations[0].duration = 1;
-        qDebug() << "Haptic " << _touch->hapticLocations[0].duration;
         _touch->initiateHapticLocations();
     }
     userInputMapper->registerDevice(_touch);
@@ -176,7 +124,7 @@ void HapticVestManager::deactivate() {
 void HapticVestManager::pluginUpdate(float deltaTime, const controller::InputCalibrationData& inputCalibrationData) {
     
     PerformanceTimer perfTimer("HapticVestManager::TouchDevice::update");
-    ConnectToHapticVest();
+    //ConnectToHapticVest();
     
     checkForConnectedDevices();
 
@@ -203,7 +151,6 @@ QStringList HapticVestManager::getSubdeviceNames() {
 void HapticVestManager::TouchDevice::update(float deltaTime,
                                                   const controller::InputCalibrationData& inputCalibrationData) {
     
-    if(!_parent.service){return;}
     
     bool isDifferentThanPreviousArray = false;
     int hapticInputArray[32];
