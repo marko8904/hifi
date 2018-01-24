@@ -146,7 +146,7 @@ namespace controller {
         return DependencyManager::get<UserInputMapper>()->getActionNames();
     }
     
-    bool ScriptingInterface::triggerHapticPulse(float strength, float duration, controller::Hand location) const {
+    bool ScriptingInterface::triggerHapticPulse(float strength, float duration, int location) const {
         return DependencyManager::get<UserInputMapper>()->triggerHapticPulse(strength, duration, location);
     }
 

@@ -976,7 +976,7 @@ void ViveControllerManager::InputDevice::handlePoseEvent(float deltaTime, const 
     _poseStateMap[isLeftHand ? controller::LEFT_HAND : controller::RIGHT_HAND] = pose.transform(controllerToAvatar);
 }
 
-bool ViveControllerManager::InputDevice::triggerHapticPulse(float strength, float duration, controller::Hand hand) {
+bool ViveControllerManager::InputDevice::triggerHapticPulse(float strength, float duration, int hand) {
     Locker locker(_lock);
     if (hand == controller::BOTH || hand == controller::LEFT) {
         if (strength == 0.0f) {

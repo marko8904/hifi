@@ -85,7 +85,7 @@ namespace controller {
         Q_INVOKABLE Pose getPoseValue(const int& source) const;
         Q_INVOKABLE Pose getPoseValue(StandardPoseChannel source, uint16_t device = 0) const;
 
-        Q_INVOKABLE bool triggerHapticPulse(float strength, float duration, controller::Hand location = BOTH) const;
+        Q_INVOKABLE bool triggerHapticPulse(float strength, float duration, int location = 2) const;
         Q_INVOKABLE bool triggerShortHapticPulse(float strength, controller::Hand hand = BOTH) const;
         Q_INVOKABLE bool triggerHapticPulseOnDevice(unsigned int device, float strength, float duration, controller::Hand hand = BOTH) const;
         Q_INVOKABLE bool triggerShortHapticPulseOnDevice(unsigned int device, float strength, controller::Hand hand = BOTH) const;

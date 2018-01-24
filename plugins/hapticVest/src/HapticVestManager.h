@@ -57,7 +57,7 @@ private:
         void update(float deltaTime, const controller::InputCalibrationData& inputCalibrationData) override;
         void focusOutEvent() override;
 
-        bool triggerHapticPulse(float strength, float duration, controller::Hand location) override;
+        bool triggerHapticPulse(float strength, float duration, int location) override;
 
     private:
         void stopHapticPulse(bool leftHand);

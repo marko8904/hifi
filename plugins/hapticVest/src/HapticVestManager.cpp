@@ -175,7 +175,7 @@ void HapticVestManager::TouchDevice::update(float deltaTime,
 void HapticVestManager::TouchDevice::focusOutEvent() {
 };
 
-bool HapticVestManager::TouchDevice::triggerHapticPulse(float strength, float duration, controller::Hand location) {
+bool HapticVestManager::TouchDevice::triggerHapticPulse(float strength, float duration, int location) {
     qDebug() << "Haptic Vest: Trigger Haptic Pulse" << strength << duration << location;
     
     //  TODO: Convert strength (map (0,1?) -> (0,15))
@@ -183,13 +183,12 @@ bool HapticVestManager::TouchDevice::triggerHapticPulse(float strength, float du
     convertedStrength = std::min(convertedStrength, 15);
     convertedStrength = std::max(convertedStrength, 0);
     //TODO: convert location (-3);
-    int _location = std::rand() % 32;
-    qDebug() << "Haptic: location: " << _location;
     // Haptic Vest Locations range from [3,34]
-//    if(_location > 2 && _location < 35) {
-        hapticLocations[_location].strength = duration > hapticLocations[_location].duration ? convertedStrength : hapticLocations[_location].strength;
-        hapticLocations[_location].duration = std::max(hapticLocations[_location].duration, duration);
-//    }
+    if(location > 2 && location < 35) {
+        location = location - 3;
+        hapticLocations[location].strength = duration > hapticLocations[location].duration ? convertedStrength : hapticLocations[location].strength;
+        hapticLocations[location].duration = std::max(hapticLocations[location].duration, duration);
+    }
     
     return false;
 }
