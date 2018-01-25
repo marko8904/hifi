@@ -358,7 +358,8 @@ bool UserInputMapper::triggerHapticPulse(float strength, float duration, int loc
     Locker locker(_lock);
     bool toReturn = false;
     for (auto device : _registeredDevices) {
-        toReturn = toReturn || device.second->triggerHapticPulse(strength, duration, location);
+        //toReturn = toReturn || device.second->triggerHapticPulse(strength, duration, location);
+        device.second->triggerHapticPulse(strength, duration, location);
     }
     return toReturn;
 }
