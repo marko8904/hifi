@@ -552,7 +552,6 @@ void PhysicsEngine::doOwnershipInfectionForConstraints() {
 
 const CollisionEvents& PhysicsEngine::getCollisionEvents() {
     _collisionEvents.clear();
-
     // scan known contacts and trigger events
     ContactMap::iterator contactItr = _contactMap.begin();
 
@@ -560,9 +559,9 @@ const CollisionEvents& PhysicsEngine::getCollisionEvents() {
         ContactInfo& contact = contactItr->second;
         ContactEventType type = contact.computeType(_numContactFrames);
         const btScalar SIGNIFICANT_DEPTH = -0.002f; // penetrations have negative distance
-        if (type != CONTACT_EVENT_TYPE_CONTINUE ||
-                (contact.distance < SIGNIFICANT_DEPTH &&
-                 contact.readyForContinue(_numContactFrames))) {
+        if (true/*type != CONTACT_EVENT_TYPE_CONTINUE ||
+            (contact.distance < SIGNIFICANT_DEPTH &&
+                contact.readyForContinue(_numContactFrames))*/) {
             ObjectMotionState* motionStateA = static_cast<ObjectMotionState*>(contactItr->first._a);
             ObjectMotionState* motionStateB = static_cast<ObjectMotionState*>(contactItr->first._b);
 
@@ -582,7 +581,8 @@ const CollisionEvents& PhysicsEngine::getCollisionEvents() {
                     (motionStateB ? motionStateB->getObjectLinearVelocityChange() : glm::vec3(0.0f));
                 glm::vec3 penetration = bulletToGLM(contact.distance * contact.normalWorldOnB);
                 _collisionEvents.push_back(Collision(type, idA, idB, position, penetration, velocityChange));
-            } else if (motionStateB && (motionStateB->shouldBeLocallyOwned())) {
+            }
+            else if (motionStateB && (motionStateB->shouldBeLocallyOwned())) {
                 QUuid idB = motionStateB->getObjectID();
                 QUuid idA;
                 if (motionStateA) {
@@ -593,7 +593,23 @@ const CollisionEvents& PhysicsEngine::getCollisionEvents() {
                     (motionStateA ? motionStateA->getObjectLinearVelocityChange() : glm::vec3(0.0f));
                 // NOTE: we're flipping the order of A and B (so that the first objectID is never NULL)
                 // hence we negate the penetration (because penetration always points from B to A).
-                glm::vec3 penetration = - bulletToGLM(contact.distance * contact.normalWorldOnB);
+                glm::vec3 penetration = -bulletToGLM(contact.distance * contact.normalWorldOnB);
+                _collisionEvents.push_back(Collision(type, idB, idA, position, penetration, velocityChange));
+            }
+            else if (motionStateA && !motionStateB) {   // This is the case if object B is MyAvatar and object A is not locally owned
+                QUuid idA = motionStateA->getObjectID();
+                QUuid idB; // MyAvatar Uuid will be null
+                glm::vec3 position = bulletToGLM(contact.getPositionWorldOnB()) + _originOffset;
+                glm::vec3 velocityChange = motionStateA->getObjectLinearVelocityChange();
+                glm::vec3 penetration = bulletToGLM(contact.distance * contact.normalWorldOnB);
+                _collisionEvents.push_back(Collision(type, idA, idB, position, penetration, velocityChange));
+            }
+            else if (motionStateB && !motionStateA) {
+                QUuid idB = motionStateB->getObjectID();
+                QUuid idA; // MyAvatar Uuid will be null
+                glm::vec3 position = bulletToGLM(contact.getPositionWorldOnA()) + _originOffset;
+                glm::vec3 velocityChange = motionStateB->getObjectLinearVelocityChange();
+                glm::vec3 penetration = -bulletToGLM(contact.distance * contact.normalWorldOnB);
                 _collisionEvents.push_back(Collision(type, idB, idA, position, penetration, velocityChange));
             }
         }
