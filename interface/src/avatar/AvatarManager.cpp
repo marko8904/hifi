@@ -415,6 +415,7 @@ void AvatarManager::handleChangedMotionStates(const VectorOfMotionStates& motion
 }
 
 void AvatarManager::handleCollisionEvents(const CollisionEvents& collisionEvents) {
+    bool hasCreatedSound = false;
     for (Collision collision : collisionEvents) {
         // TODO: The plan is to handle MOTIONSTATE_TYPE_AVATAR, and then MOTIONSTATE_TYPE_MYAVATAR. As it is, other
         // people's avatars will have an id that doesn't match any entities, and one's own avatar will have
@@ -423,8 +424,9 @@ void AvatarManager::handleCollisionEvents(const CollisionEvents& collisionEvents
         if (collision.idA.isNull() || collision.idB.isNull()) {
             auto myAvatar = getMyAvatar();
             myAvatar->collisionWithEntity(collision);
+            
             auto collisionSound = myAvatar->getCollisionSound();
-            if (collisionSound) {
+            if (collisionSound && !hasCreatedSound) {
                 const auto characterController = myAvatar->getCharacterController();
                 const float avatarVelocityChange = (characterController ? glm::length(characterController->getVelocityChange()) : 0.0f);
                 const float velocityChange = glm::length(collision.velocityChange) + avatarVelocityChange;
@@ -432,7 +434,7 @@ void AvatarManager::handleCollisionEvents(const CollisionEvents& collisionEvents
                 const bool isSound = (collision.type == CONTACT_EVENT_TYPE_START) && (velocityChange > MIN_AVATAR_COLLISION_ACCELERATION);
 
                 if (!isSound) {
-                    return;  // No sense iterating for others. We only have one avatar.
+                    hasCreatedSound = true; // No sense iterating for others. We only have one avatar.
                 }
                 // Your avatar sound is personal to you, so let's say the "mass" part of the kinetic energy is already accounted for.
                 const float energy = velocityChange * velocityChange;
@@ -443,9 +445,11 @@ void AvatarManager::handleCollisionEvents(const CollisionEvents& collisionEvents
                 // but most avatars are roughly the same size, so let's not be so fancy yet.
                 const float AVATAR_STRETCH_FACTOR = 1.0f;
 
+                /*
                 _collisionInjectors.remove_if([](const AudioInjectorPointer& injector) {
                     return !injector || injector->isFinished();
                 });
+                */
 
                 static const int MAX_INJECTOR_COUNT = 3;
                 if (_collisionInjectors.size() < MAX_INJECTOR_COUNT) {
@@ -453,8 +457,7 @@ void AvatarManager::handleCollisionEvents(const CollisionEvents& collisionEvents
                                                              myAvatar->getWorldPosition());
                     _collisionInjectors.emplace_back(injector);
                 }
-                //myAvatar->collisionWithEntity(collision);
-                return;
+                hasCreatedSound = true;
             }
         }
     }
