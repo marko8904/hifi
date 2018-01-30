@@ -96,6 +96,7 @@ var motors = [
 
 // Scales: angle (-180, 180], height [0,1] (for the torso, although could be outside of that range), totalStrength [0,15]
 function VibrateMotorsForCollision(angle, height, totalStrength) {
+	// print("this called");
 	var MAXIMUM_DISTANCE = .5;
 	for (var i = motors.length - 1; i >= 0; i--) {
 		motor = motors[i];
@@ -112,8 +113,8 @@ function VibrateMotorsForCollision(angle, height, totalStrength) {
 		print(combinedDistance);
 		if(combinedDistance < MAXIMUM_DISTANCE) {
 			var strengthForThisMotor = linearMap(combinedDistance, 0, MAXIMUM_DISTANCE, totalStrength, 0);
-			// Controller.triggerHapticPulse(strengthForThisMotor, 0.1, motor.id);
-			print("Triggering motor " + motor.id + " at strength " + strengthForThisMotor + " for collision at angle " + angle + " and height " + height);
+			Controller.triggerHapticPulse(strengthForThisMotor, 0.1, motor.id);
+			// print("Triggering motor " + motor.id + " at strength " + strengthForThisMotor + " for collision at angle " + angle + " and height " + height);
 		}
 	}
 }

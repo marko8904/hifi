@@ -54,8 +54,13 @@ void HapticVestManager::ConnectToHapticVest(){
     for (int i = 0; i < ListOfPorts.size(); i++) {
         qDebug() << "Haptic; port:" << ListOfPorts[i].portName();
     }
-    serialPort = new QSerialPort(ListOfPorts[0]);
-    serialPort->open(QIODevice::WriteOnly);
+    if (ListOfPorts.count() > 0) {
+        serialPort = new QSerialPort(ListOfPorts[0]);
+        serialPort->open(QIODevice::WriteOnly);
+    }
+    else {
+        serialPort = nullptr;
+    }
 }
 
 
@@ -84,7 +89,9 @@ void HapticVestManager::TurnOffAllMotors(){
 }
 
 void HapticVestManager::SendByteArray(QByteArray byteArray){
-    serialPort->write(byteArray);
+    if (serialPort) {
+        serialPort->write(byteArray);
+    }
 }
 
 void HapticVestManager::checkForConnectedDevices() {
@@ -176,7 +183,7 @@ void HapticVestManager::TouchDevice::focusOutEvent() {
 };
 
 bool HapticVestManager::TouchDevice::triggerHapticPulse(float strength, float duration, int location) {
-    qDebug() << "Haptic Vest: Trigger Haptic Pulse" << strength << duration << location;
+    // qDebug() << "Haptic Vest: Trigger Haptic Pulse" << strength << duration << location;
     
     //  TODO: Convert strength (map (0,1?) -> (0,15))
     int convertedStrength = strength;

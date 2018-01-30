@@ -421,6 +421,7 @@ void AvatarManager::handleCollisionEvents(const CollisionEvents& collisionEvents
         // people's avatars will have an id that doesn't match any entities, and one's own avatar will have
         // an id of null. Thus this code handles any collision in which one of the participating objects is
         // my avatar. (Other user machines will make a similar analysis and inject sound for their collisions.)
+
         if (collision.idA.isNull() || collision.idB.isNull()) {
             auto myAvatar = getMyAvatar();
             myAvatar->collisionWithEntity(collision);
