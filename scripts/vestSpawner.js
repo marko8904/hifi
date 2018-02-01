@@ -40,7 +40,7 @@ for (var i = cubes.length - 1; i >= 0; i--) {
 		type: "Box",
 		dimensions: {x: .05, y: .05, z: .05},
 		name: "VestBox" + cube.id,
-		color: {red: cube.id, green: 0, blue: 01},
+		color: {red: cube.id, green: 1, blue: 0},
 		parentID: "{00000000-0000-0000-0000-000000000001}",
 		script: Script.resolvePath("vestCollisionBox.js"),
 		collisionMask: 23,// Do not collide with my avatar
