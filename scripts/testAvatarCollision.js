@@ -19,7 +19,7 @@ function collisionWithEntity(collision) {
 	localPosition.y = 0;
 	var yAxisRotation = Quat.safeEulerAngles(Quat.rotationBetween(localPosition, Quat.getForward(MyAvatar.orientation))).y;
     // print("collision!: " + JSON.stringify(localPosition));
-    print("collision!\nangle: " + yAxisRotation + "\nheight: " + collisionHeightBetweenNeckAndHips);
+    // print("collision!\nangle: " + yAxisRotation + "\nheight: " + collisionHeightBetweenNeckAndHips);
 
     VibrateMotorsForCollision(yAxisRotation, collisionHeightBetweenNeckAndHips, 15);
     //TODO: calculate total strength
@@ -100,17 +100,17 @@ function VibrateMotorsForCollision(angle, height, totalStrength) {
 	var MAXIMUM_DISTANCE = .5;
 	for (var i = motors.length - 1; i >= 0; i--) {
 		motor = motors[i];
-		print(motor.id);
+		// print(motor.id);
 		var verticalDistance = height - motor.height;
-		print(verticalDistance);
+		// print(verticalDistance);
 		//Find shortest rotation
 		var angularDistance = angle - motor.angle;
 		angularDistance = angularDistance > 180 ? 360 - angularDistance : angularDistance;
 		angularDistance = angularDistance < -180 ? 360 + angularDistance : angularDistance;
 		angularDistance = linearMap(angularDistance, -180, 180, 0, 2);
-		print(angularDistance);
+		// print(angularDistance);
 		var combinedDistance = Math.sqrt(verticalDistance * verticalDistance + angularDistance * angularDistance);
-		print(combinedDistance);
+		// print(combinedDistance);
 		if(combinedDistance < MAXIMUM_DISTANCE) {
 			var strengthForThisMotor = linearMap(combinedDistance, 0, MAXIMUM_DISTANCE, totalStrength, 0);
 			Controller.triggerHapticPulse(strengthForThisMotor, 0.1, motor.id);

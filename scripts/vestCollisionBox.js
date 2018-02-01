@@ -4,24 +4,18 @@
 	}
 
 	var _this;
+	var motorID;
 
 	VestCollisionBox.prototype = {
 		preload: function(entityID){
 			_this = this;
 			_this.entityID = entityID;
-			print('created collision box with motorID: ' + getMotorID());
-		},
-		clickDownOnEntity: function(entityID, event){
-			// print("properties: " + JSON.stringify(Entities.getEntityProperties(entityID)));
-			changeColor(entityID);
-			print('Motor ID: ' + getMotorID());
-			Controller.triggerHapticPulse(15,3.5, getMotorID());
+			_this.motorID = getMotorID();
+			// print('created collision box with motorID: ' + getMotorID());
 		},
 		collisionWithEntity: function(myID, otherID, collisionInfo){
-			// print("collision!: " + Entities.getEntityProperties(myID).motorID);
 			changeColor(myID);
-			changeColor(otherID);
-			Controller.triggerHapticPulse(15,.25, getMotorID());
+			Controller.triggerHapticPulse(15,.25, MotorID);
 		}
 	}
 

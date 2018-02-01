@@ -40,15 +40,13 @@ for (var i = cubes.length - 1; i >= 0; i--) {
 		type: "Box",
 		dimensions: {x: .05, y: .05, z: .05},
 		name: "VestBox" + cube.id,
-		color: {red: cube.id, green: 0, blue: 100},
+		color: {red: cube.id, green: 0, blue: 01},
 		parentID: "{00000000-0000-0000-0000-000000000001}",
 		script: Script.resolvePath("vestCollisionBox.js"),
-		motorID: cube.id,
 		collisionMask: 23,// Do not collide with my avatar
-		dynamic: true
+		dynamic: true,
+		visible: true
 	});
-	print("properties: " + JSON.stringify(Entities.getEntityProperties(entityID)));
-	print("red: " + Entities.getEntityProperties(entityID).color.red);
 }
 
 function getVectorRelativeToAvatar(x,y,z){
