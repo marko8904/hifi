@@ -37,29 +37,23 @@ const char* HapticVestManager::NAME = "Haptic Vest";
 //const quint64 LOST_TRACKING_DELAY = 3000000;
 
 bool HapticVestManager::isSupported() const {
-    return true;	//  TODO: return if BLE is supported
+    return true;
 }
 
 bool HapticVestManager::activate() {
     InputPlugin::activate();
-    //checkForConnectedDevices();
     ConnectToHapticVest();
-    //CreateBleController();
-    //ConnectToHapticVest();
     return true;
 }
 
 void HapticVestManager::ConnectToHapticVest(){
     ListOfPorts = QSerialPortInfo::availablePorts();
-    for (int i = 0; i < ListOfPorts.size(); i++) {
-        qDebug() << "Haptic; port:" << ListOfPorts[i].portName();
-    }
-    if (ListOfPorts.count() > 0) {
+    //TODO: Pick appropriate port (rather than picking first available port)
+    if (ListOfPorts.size() > 0) {
         serialPort = new QSerialPort(ListOfPorts[0]);
-        serialPort->open(QIODevice::WriteOnly);
-    }
-    else {
-        serialPort = nullptr;
+        if (serialPort) {
+            serialPort->open(QIODevice::WriteOnly);
+        }
     }
 }
 
@@ -73,7 +67,7 @@ QByteArray HapticVestManager::TouchDevice::EncodeVibrationArray(int inputArray[]
     encodedByteArray[0] = 0x00;
 
     for (int i = 0; i < numberOfMotors; i += 2) {
-        // Process two channels at a time
+        // Combine two motor intensities into one byte per protocol
         encodedByteArray [i / 2 + 1] = ((inputArray [i]) << 4) | (inputArray [i + 1] & 0x0F);
     }
     return encodedByteArray;
@@ -85,7 +79,9 @@ void HapticVestManager::TurnOffAllMotors(){
     for (int i = 0; i < numberOfMotors; i++) {
         offArray[i] = 0;
     }
-    SendByteArray(_touch->EncodeVibrationArray(offArray));
+    if (_touch) {
+        SendByteArray(_touch->EncodeVibrationArray(offArray));
+    }
 }
 
 void HapticVestManager::SendByteArray(QByteArray byteArray){
@@ -95,15 +91,18 @@ void HapticVestManager::SendByteArray(QByteArray byteArray){
 }
 
 void HapticVestManager::checkForConnectedDevices() {
+    if (!serialPort) {
+        ConnectToHapticVest();
+    }
+
     if (_touch) {
         return;
     }
+
  
     auto userInputMapper = DependencyManager::get<controller::UserInputMapper>();
     _touch = std::make_shared<TouchDevice>(*this);
-    if(_touch) {
-        _touch->initiateHapticLocations();
-    }
+    _touch->initiateHapticLocations();
     userInputMapper->registerDevice(_touch);
 }
 
@@ -117,14 +116,13 @@ void HapticVestManager::TouchDevice::initiateHapticLocations(){
 void HapticVestManager::deactivate() {
     InputPlugin::deactivate();
 
-//    if (_session) {
-//        _session = nullptr;
-//    }
-
     // unregister with UserInputMapper
     auto userInputMapper = DependencyManager::get<controller::UserInputMapper>();
     if (_touch) {
         userInputMapper->removeDevice(_touch->getDeviceID());
+    }
+    if (serialPort) {
+        serialPort->close();
     }
 }
 
@@ -136,15 +134,12 @@ void HapticVestManager::pluginUpdate(float deltaTime, const controller::InputCal
     checkForConnectedDevices();
 
     if (_touch) {
-        // if (OVR_SUCCESS(ovr_GetInputState(_session, ovrControllerType_Touch, &_inputState))) {
-             _touch->update(deltaTime, inputCalibrationData);
-        // } else {
-        //     qCWarning(oculus) << "Unable to read Oculus touch input state";
-        // }
+        _touch->update(deltaTime, inputCalibrationData);
     }
 }
 
 void HapticVestManager::pluginFocusOutEvent() {
+    TurnOffAllMotors();
 }
 
 QStringList HapticVestManager::getSubdeviceNames() {
@@ -172,7 +167,6 @@ void HapticVestManager::TouchDevice::update(float deltaTime,
     }
     if(isDifferentThanPreviousArray){
         _parent.SendByteArray(EncodeVibrationArray(hapticInputArray));
-//        qDebug() << "Haptic Vest: Sending new haptic array (encoded): " << EncodeVibrationArray(hapticInputArray);
         for (int i = 0; i < 32; i++) {
             previousHapticArray[i] = hapticInputArray[i];
         }
@@ -182,27 +176,22 @@ void HapticVestManager::TouchDevice::update(float deltaTime,
 void HapticVestManager::TouchDevice::focusOutEvent() {
 };
 
+//TODO: this should be decoupled from haptic pulse; although it is a haptic pulse, it is for the haptic vest specifically and does not need to be an override of the haptic pulse method that generalizes to any controller
 bool HapticVestManager::TouchDevice::triggerHapticPulse(float strength, float duration, int location) {
-    // qDebug() << "Haptic Vest: Trigger Haptic Pulse" << strength << duration << location;
     
-    //  TODO: Convert strength (map (0,1?) -> (0,15))
-    int convertedStrength = strength;
+    int convertedStrength = std::round(strength * 15);
     convertedStrength = std::min(convertedStrength, 15);
     convertedStrength = std::max(convertedStrength, 0);
-    //TODO: convert location (-3);
+
     // Haptic Vest Locations range from [3,34]
     if(location > 2 && location < 35) {
-        location = location - 3;
+        location -= 3;
         hapticLocations[location].strength = duration > hapticLocations[location].duration ? convertedStrength : hapticLocations[location].strength;
         hapticLocations[location].duration = std::max(hapticLocations[location].duration, duration);
     }
     
     return false;
 }
-
-//void HapticVestManager::TouchDevice::stopHapticPulse(bool leftHand) {
-//    // ovr_SetControllerVibration(_parent._session, handType, 0.0f, 0.0f);
-//}
 
 controller::Input::NamedVector HapticVestManager::TouchDevice::getAvailableInputs() const {
     using namespace controller;
