@@ -1,4 +1,4 @@
-var cubes = [
+var motors = [
 {id: 10, x: -0.042, y: 0, z: 0.101}, 
 {id: 9, x: -0.101, y: 0, z: 0.042}, 
 {id: 7, x: -0.101, y: 0, z: -0.042}, 
@@ -33,21 +33,43 @@ var cubes = [
 {id: 31, x: 0.042, y: 0.4, z: 0.101}
 ];
 
-for (var i = cubes.length - 1; i >= 0; i--) {
-	cube = cubes[i];
-	var entityID = Entities.addEntity({
-		position: getVectorRelativeToAvatar(cube.x, cube.y, cube.z),
-		type: "Box",
-		dimensions: {x: .05, y: .05, z: .05},
-		name: "VestBox" + cube.id,
-		color: {red: cube.id, green: 1, blue: 0},
-		parentID: "{00000000-0000-0000-0000-000000000001}",
-		script: Script.resolvePath("vestCollisionBox.js"),
-		collisionMask: 23,// Do not collide with my avatar
-		dynamic: true,
-		visible: true
-	});
+// for (var i = motors.length - 1; i >= 0; i--) {
+// 	motor = motors[i];
+// 	var entityID = Entities.addEntity({
+// 		position: getVectorRelativeToAvatar(motor.x, motor.y, motor.z),
+// 		type: "Box",
+// 		dimensions: {x: .05, y: .05, z: .05},
+// 		name: "VestBox" + motor.id,
+// 		color: {red: motor.id, green: 1, blue: 0},
+// 		parentID: "{00000000-0000-0000-0000-000000000001}",
+// 		script: Script.resolvePath("vestCollisionBox.js"),
+// 		collisionMask: 23,// Do not collide with my avatar
+// 		dynamic: true,
+// 		visible: true,
+// 		parentJointIndex: 16,
+// 		grabbable: false
+// 	}, true);
+// }
+
+
+var update = function(delta){
+	// var avatars = AvatarList.getAvatarIdentifiers();
+	// avatars.forEach(function(id){
+	// 	var avatar = AvatarList.getAvatar(id);
+	// 	["RightHandPinky2","LeftHandPinky2"].forEach(function(joint){
+	// 		var jointPos = avatar.getJointPosition(joint);
+	// 		var distance = Vec3.distance(Entities.getEntityProperties(_this.entityID).position, jointPos);
+	// 		if(distance < .1){
+	// 			// print("motor " + _this.motorID + " is distance " + distance + " from joint " + joint);
+	// 			Controller.triggerHapticPulse(15, .25, _this.motorID);
+	// 			setColor(_this.entityID, distance * 20)
+	// 		}
+	// 	});
+	// });
+	print("updating!: " + delta);
 }
+
+Script.update.connect(update);
 
 function getVectorRelativeToAvatar(x,y,z){
 	var frontVector = Vec3.multiply(Quat.getFront(MyAvatar.orientation), z);
