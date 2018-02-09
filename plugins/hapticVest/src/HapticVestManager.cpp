@@ -53,10 +53,18 @@ void HapticVestManager::ConnectToHapticVest(){
         serialPort = new QSerialPort(ListOfPorts[0]);
         if (serialPort) {
             serialPort->open(QIODevice::WriteOnly);
+            connect(serialPort, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(serialPortErrorOccurred(QSerialPort::SerialPortError)));
         }
     }
 }
 
+void HapticVestManager::serialPortErrorOccurred(QSerialPort::SerialPortError error) {
+    if (error == QSerialPort::ResourceError && serialPort) {
+        serialPort->close();
+        serialPort->open(QIODevice::WriteOnly);
+    }
+    //serialPort = nullptr;
+}
 
 QByteArray HapticVestManager::TouchDevice::EncodeVibrationArray(int inputArray[]){
     //TODO: ensure that inputArray is of length numberOfMotors
@@ -86,7 +94,12 @@ void HapticVestManager::TurnOffAllMotors(){
 
 void HapticVestManager::SendByteArray(QByteArray byteArray){
     if (serialPort) {
-        serialPort->write(byteArray);
+        if (serialPort->isOpen()) {
+            serialPort->write(byteArray);
+        }
+        else {
+            serialPort->open(QIODevice::WriteOnly);
+        }
     }
 }
 

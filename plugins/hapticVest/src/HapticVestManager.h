@@ -36,6 +36,8 @@ public:
     void pluginFocusOutEvent() override;
     void pluginUpdate(float deltaTime, const controller::InputCalibrationData& inputCalibrationData) override;
 
+    private slots:
+        void serialPortErrorOccurred(QSerialPort::SerialPortError error);
 
     
 private:
