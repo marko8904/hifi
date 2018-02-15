@@ -48,9 +48,13 @@ bool HapticVestManager::activate() {
 
 void HapticVestManager::ConnectToHapticVest(){
     ListOfPorts = QSerialPortInfo::availablePorts();
+    qDebug() << "Haptic ports count: " << ListOfPorts.size();
+    /*for (int i = 0; i < ListOfPorts.size(); i++) {
+        qDebug() << "Haptic port: " << ListOfPorts[i].portName;
+    }*/
     //TODO: Pick appropriate port (rather than picking first available port)
     if (ListOfPorts.size() > 0) {
-        serialPort = new QSerialPort(ListOfPorts[0]);
+        serialPort = new QSerialPort(ListOfPorts[ListOfPorts.size() - 1]);
         if (serialPort) {
             serialPort->open(QIODevice::WriteOnly);
             connect(serialPort, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(serialPortErrorOccurred(QSerialPort::SerialPortError)));
