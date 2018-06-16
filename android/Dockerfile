@@ -12,13 +12,13 @@ RUN apt-get update && apt-get -y install \
 # --- Versions and Download paths
 ENV ANDROID_HOME="/usr/local/android-sdk" \
     ANDROID_NDK_HOME="/usr/local/android-ndk" \
-    ANDROID_VERSION=27 \
-    ANDROID_BUILD_TOOLS_VERSION=27.0.3 \
-    ANDROID_NDK_VERSION=r17 \
-    GRADLE_VERSION=4.8 \
+    ANDROID_VERSION=26 \
+    ANDROID_BUILD_TOOLS_VERSION=26.0.2 \
+    ANDROID_NDK_VERSION=r16 \
+    GRADLE_VERSION=4.3.1 \
     QT_VERSION=5.10.1
 
-ENV SDK_URL="https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip" \
+ENV SDK_URL="https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip" \
     NDK_URL="https://dl.google.com/android/repository/android-ndk-${ANDROID_NDK_VERSION}-linux-x86_64.zip" \
     GRADLE_URL="https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip"
 
