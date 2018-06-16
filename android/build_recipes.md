@@ -29,7 +29,19 @@ export CFLAGS="-fPIE -fPIC"
 export LDFLAGS="-pie"
 ```
 
-  
+## Building and apk with Docker
+
+* Currently supported on Mac and Linux
+* Requires a working installation of DockerCE or EE (from docker.com)
+* The build process is self contained and will produce an apk at the end
+* Toolchain and target versioning can be controlled by modifying Dockerfile
+* Start the build by running `start_build_container.sh.`
+
+Example invocation
+
+```
+DOCKER_IMAGE_NAME=androidbuild.image HIFI_REPO_PATH="${PWD}/../" RELEASE_NUMBER="1000" RELEASE_TYPE="PRODUCTION" ANDROID_BUILD_TARGET="assembleRelease" ANDROID_BUILD_COMMAND="./build_android.sh" ./start_build_container.sh
+```
 
 ## Qt
 
