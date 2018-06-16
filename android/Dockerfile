@@ -43,6 +43,8 @@ RUN $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSIO
     "platforms;android-${ANDROID_VERSION}" \
     "platform-tools"
 
+RUN chmod -R a+w "${ANDROID_HOME}"
+
 # --- Android NDK
 # download
 RUN mkdir /usr/local/android-ndk-tmp && \
