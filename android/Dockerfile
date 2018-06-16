@@ -12,6 +12,7 @@ RUN apt-get update && apt-get -y install \
 # --- Versions and Download paths
 ENV ANDROID_HOME="/usr/local/android-sdk" \
     ANDROID_NDK_HOME="/usr/local/android-ndk" \
+    ANDROID_SDK_HOME="/usr/local/android-sdk-home" \
     ANDROID_VERSION=26 \
     ANDROID_BUILD_TOOLS_VERSION=26.0.2 \
     ANDROID_NDK_VERSION=r16 \
@@ -30,7 +31,7 @@ RUN apt-get -y update && apt-get -y install hifiqt${QT_VERSION}
 ENV QT_CMAKE_PREFIX_PATH="/usr/local/Qt${QT_VERSION}/${QT_VERSION}/gcc_64/lib/cmake"
 
 # --- Android SDK
-RUN mkdir "$ANDROID_HOME" .android && \
+RUN mkdir -p "$ANDROID_HOME" "$ANDROID_SDK_HOME" && \
     cd "$ANDROID_HOME" && \
     curl -s -S -o sdk.zip -L "${SDK_URL}" && \
     unzip sdk.zip && \
@@ -44,6 +45,7 @@ RUN $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSIO
     "platform-tools"
 
 RUN chmod -R a+w "${ANDROID_HOME}"
+RUN chmod -R a+w "${ANDROID_SDK_HOME}"
 
 # --- Android NDK
 # download
