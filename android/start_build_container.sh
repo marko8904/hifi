@@ -4,7 +4,7 @@ set -xeuo pipefail
 docker build -t "${DOCKER_IMAGE_NAME}" -f Dockerfile .
 
 docker run \
-   -it --rm \
+   --rm \
    -v "${HIFI_REPO_PATH}":/hifi \
    -e "RELEASE_NUMBER=${RELEASE_NUMBER}" \
    -e "RELEASE_TYPE=${RELEASE_TYPE}" \

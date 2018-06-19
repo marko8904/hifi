@@ -29,9 +29,9 @@ export CFLAGS="-fPIE -fPIC"
 export LDFLAGS="-pie"
 ```
 
-## Building and apk with Docker
+## Building an apk with Docker
 
-* Currently supported on Mac and Linux
+* Currently supported on Mac, Linux and Windows
 * Requires a working installation of DockerCE or EE (from docker.com)
 * The build process is self contained and will produce an apk at the end
 * Toolchain and target versioning can be controlled by modifying Dockerfile
